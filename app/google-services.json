@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1045633600864",
+    "firebase_url": "https://credo-f5cf7.firebaseio.com",
+    "project_id": "credo-f5cf7",
+    "storage_bucket": "credo-f5cf7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1045633600864:android:d7e363ac018a779695e205",
+        "android_client_info": {
+          "package_name": "com.credo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1045633600864-4gg2tdkgusui11cpa0k16ltlb37slv22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4jN9lROCqmieM6QP--MpDMGHGM1RNLAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1045633600864-4gg2tdkgusui11cpa0k16ltlb37slv22.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
