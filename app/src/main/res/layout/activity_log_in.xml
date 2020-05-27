@@ -11,9 +11,9 @@
         android:id="@+id/welcome_text_TV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome to"
+        android:text="Hello!"
         android:textStyle="bold"
-        android:textSize="25sp"
+        android:textSize="40sp"
         android:textColor="#FFFFFF"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
@@ -24,14 +24,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/welcome_text_TV"
-        android:text="Credo Space"
+        android:text="Welcome to Credo Space"
         android:textStyle="bold"
-        android:textSize="40sp"
+        android:textSize="20sp"
         android:textColor="#FFFFFF"
         android:textAppearance="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="2dp"
         android:gravity="center"
         android:fontFamily="sans-serif-medium" />
+
+    <RelativeLayout
+        android:id="@+id/login_buttons_RL"
+        android:layout_width="500dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/credo_TV"
+        android:layout_marginTop="200dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginLeft="45dp"
+        android:backgroundTint="@color/colorAccent">
+
+        <com.shobhitpuri.custombuttons.GoogleSignInButton
+            android:id="@+id/google_signin_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="Continue with Google"
+            android:textStyle="bold"
+            android:textSize="2sp"
+            app:isDarkTheme="true"
+            android:layout_centerHorizontal="true"
+            />
+
+
+    </RelativeLayout>
 
 </RelativeLayout>
