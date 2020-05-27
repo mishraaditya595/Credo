@@ -6,11 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/signout_button"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SignOut"
-        android:layout_centerInParent="true"/>
+        android:background="@color/colorPrimary"
+        app:title="Credo Space"
+        app:titleTextColor="@color/common_google_signin_btn_text_dark"
+        app:titleMargin="2sp"
+        app:menu="@menu/options_menu">
+
+    </androidx.appcompat.widget.Toolbar>
+
+
 
 </RelativeLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignInActivity"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/welcome_text_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hello!"
+        android:textStyle="bold"
+        android:textSize="40sp"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/credo_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcome_text_TV"
+        android:text="Welcome to Credo Space"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:textAppearance="@style/Widget.AppCompat.Spinner.Underlined"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium" />
+
+    <RelativeLayout
+        android:id="@+id/login_buttons_RL"
+        android:layout_width="500dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/credo_TV"
+        android:layout_marginTop="200dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginLeft="45dp"
+        android:backgroundTint="@color/colorAccent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="2dp">
+            <com.shobhitpuri.custombuttons.GoogleSignInButton
+                android:id="@+id/google_signin_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="2sp"
+                app:isDarkTheme="false"
+                android:layout_centerHorizontal="true"
+                />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+</RelativeLayout>
