@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AccountSetupActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/account_setup_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:title="Profile Setup"
+        app:titleTextColor="@color/common_google_signin_btn_text_dark"
+        app:titleMargin="2sp">
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/account_setup_toolbar"
+        android:layout_centerInParent="true"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/set_profile_image"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="70dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>
