@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.item_sign_out:
                 userSignOut();
                 return true;
+            case R.id.item_settings:
+                startActivity(new Intent(MainActivity.this,AccountSetupActivity.class));
+                return true;
         }
 
         return true;

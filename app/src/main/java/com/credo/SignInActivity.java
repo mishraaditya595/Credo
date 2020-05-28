@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -27,6 +28,8 @@ public class SignInActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN=8888;
     private FirebaseAuth mAuth;
+    private ProgressBar signinProgressBar;
+
 
     @Override
     protected void onStart() {
@@ -45,7 +48,7 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        mAuth=FirebaseAuth.getInstance();
+        initialiseFields();
         configureGoogleSignIn();
 
         //when user clicks on the signin button, the popup window containing all gmail ids opens up
@@ -55,6 +58,11 @@ public class SignInActivity extends AppCompatActivity {
                 signIn();
             }
         });
+    }
+
+    private void initialiseFields() {
+        mAuth=FirebaseAuth.getInstance();
+        signinProgressBar=findViewById(R.id.signin_PB);
     }
 
     private void configureGoogleSignIn() {
