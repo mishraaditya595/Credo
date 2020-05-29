@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,14 +15,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -41,6 +47,8 @@ public class AccountSetupActivity extends AppCompatActivity {
     private Uri profileImageURI=null;
     private ProgressBar setupProgressBar;
     private FirebaseFirestore firestore;
+    private String UID;
+    private boolean isChanged=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +57,43 @@ public class AccountSetupActivity extends AppCompatActivity {
 
         displayToolbar(); //to display the activity's toolbar
         initialiseFields();
+
+        setupProgressBar.setVisibility(View.VISIBLE);
+        ((Button)findViewById(R.id.submit_button)).setEnabled(false);
+        firestore.collection("users").document(UID).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @SuppressLint("CheckResult")
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful())
+                        {
+                            if (task.getResult().exists())
+                            {
+                                //this is if the user already exists in our database
+                                String name = task.getResult().getString("name");
+                                String profileImage = task.getResult().getString("profile image");
+                                profileImageURI=Uri.parse(profileImage);
+
+                                ((EditText)findViewById(R.id.set_name_ET)).setText(name);
+                                RequestOptions placeholderrequest = new RequestOptions();
+                                placeholderrequest.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait);
+                                Glide.with(AccountSetupActivity.this).setDefaultRequestOptions(placeholderrequest).load(profileImage).into((ImageView)findViewById(R.id.set_profile_image));
+                            }
+                            else
+                            {
+                                Toast.makeText(AccountSetupActivity.this, "Please setup your profile", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else
+                        {
+                            String errorMsg=task.getException().getMessage();
+                            Toast.makeText(AccountSetupActivity.this, "Firestore Error: "+errorMsg, Toast.LENGTH_SHORT).show();
+                        }
+                        setupProgressBar.setVisibility(View.INVISIBLE);
+                        ((Button)findViewById(R.id.submit_button)).setEnabled(true);
+
+                    }
+                });
 
         /*this is when user taps on the profile image view, we check if necessary permissions
             are granted or not and then allow user to choose an image from his/her device's storage
@@ -81,63 +126,75 @@ public class AccountSetupActivity extends AppCompatActivity {
         findViewById(R.id.submit_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String user_name= ((EditText)findViewById(R.id.set_name_ET)).getText().toString();
-                if(user_name.isEmpty())
-                {
-                    //if user does not have a username, we cannot proceed forward
-                    Toast.makeText(AccountSetupActivity.this, "Please enter your name.", Toast.LENGTH_SHORT).show();
-                }
-                else if(!user_name.isEmpty() && profileImageURI==null)
-                {
+                final String user_name = ((EditText) findViewById(R.id.set_name_ET)).getText().toString();
+                setupProgressBar.setVisibility(View.VISIBLE);
+                if (isChanged) {
+                    if (user_name.isEmpty()) {
+                        //if user does not have a username, we cannot proceed forward
+                        Toast.makeText(AccountSetupActivity.this, "Please enter your name.", Toast.LENGTH_SHORT).show();
+                    }
+                    //else if(!user_name.isEmpty() && profileImageURI==null)
+
                     //this is if user has name but decides not to set any profile image
 
+                    else if (!TextUtils.isEmpty(user_name) && profileImageURI != null) {
+                        UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        final StorageReference imagePath = storageReference.child("profile_images").child(UID + ".jpg");
+                        imagePath.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    storeFirestore(imagePath, user_name);
+                                } else {
+                                    Toast.makeText(AccountSetupActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    setupProgressBar.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        });
+                    }
                 }
-                else if(!TextUtils.isEmpty(user_name) && profileImageURI!=null)
+                else
                 {
-                    setupProgressBar.setVisibility(View.VISIBLE);
-                    final String UID=FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    final StorageReference imagePath = storageReference.child("profile_images").child(UID+".jpg");
-                    imagePath.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if(task.isSuccessful())
-                            {
-                                Task<Uri> downloadUri= imagePath.getDownloadUrl();
-
-                                //the map will contain the details of the user that we will store in our database
-                                Map<String, String> userMap=new HashMap<>();
-                                userMap.put("name", user_name);
-                                userMap.put("profile image",downloadUri.toString());
-
-                                firestore.collection("users").document(UID).set(userMap)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if(task.isSuccessful())
-                                                {
-                                                    startActivity(new Intent(AccountSetupActivity.this,MainActivity.class));
-                                                    finish();
-                                                }
-                                                else
-                                                {
-                                                    String errorMsg=task.getException().getMessage();
-                                                    Toast.makeText(AccountSetupActivity.this, "Firestore Error: "+errorMsg, Toast.LENGTH_SHORT).show();
-
-                                                }
-                                                setupProgressBar.setVisibility(View.INVISIBLE);
-                                            }
-                                        });
-                            }
-                            else
-                            {
-                                Toast.makeText(AccountSetupActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                setupProgressBar.setVisibility(View.INVISIBLE);
-                            }
-                        }
-                    });
+                    storeFirestore(null,user_name);
                 }
             }
         });
+    }
+
+    private void storeFirestore(StorageReference imagePath, String user_name) {
+        Task<Uri> downloadUri;
+        //the map will contain the details of the user that we will store in our database
+        Map<String, String> userMap=new HashMap<>();
+       if (imagePath!=null)
+       {
+           downloadUri = imagePath.getDownloadUrl();
+           userMap.put("name", user_name);
+           userMap.put("profile image",downloadUri.toString());
+       }
+       else
+       {
+           userMap.put("name", user_name);
+           userMap.put("profile image",profileImageURI.toString());
+       }
+
+        firestore.collection("users").document(UID).set(userMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            startActivity(new Intent(AccountSetupActivity.this,MainActivity.class));
+                            finish();
+                        }
+                        else
+                        {
+                            String errorMsg=task.getException().getMessage();
+                            Toast.makeText(AccountSetupActivity.this, "Firestore Error: "+errorMsg, Toast.LENGTH_SHORT).show();
+
+                        }
+                        setupProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
     }
 
     private void initialiseFields() {
@@ -145,6 +202,7 @@ public class AccountSetupActivity extends AppCompatActivity {
         firestore=FirebaseFirestore.getInstance();
         storageReference= FirebaseStorage.getInstance().getReference();
         setupProgressBar=findViewById(R.id.account_setup_PB);
+        UID=mAuth.getCurrentUser().getUid();
     }
 
     private void imageCropper() {
@@ -164,6 +222,7 @@ public class AccountSetupActivity extends AppCompatActivity {
             {
                 profileImageURI = result.getUri();
                 ((CircleImageView)findViewById(R.id.set_profile_image)).setImageURI(profileImageURI);
+                isChanged=true;
             }
             else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
             {
