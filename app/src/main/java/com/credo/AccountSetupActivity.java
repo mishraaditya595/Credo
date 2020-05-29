@@ -22,11 +22,15 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -36,6 +40,7 @@ public class AccountSetupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Uri profileImageURI=null;
     private ProgressBar setupProgressBar;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +66,14 @@ public class AccountSetupActivity extends AppCompatActivity {
                     }
                     else
                     {
-                        // start crop image to get image for cropping and then use the image in cropping activity
-                        CropImage.activity()
-                                .setGuidelines(CropImageView.Guidelines.ON)
-                                .setAspectRatio(1,1)
-                                .start(AccountSetupActivity.this);
+                        // start crop image activity to get image for cropping and then use the image in cropping activity
+                        imageCropper();
                     }
+                }
+                //else part is for users with devices below Android M. Permissions are automatically granted in those devices
+                else
+                {
+                    imageCropper();
                 }
             }
         });
@@ -74,15 +81,21 @@ public class AccountSetupActivity extends AppCompatActivity {
         findViewById(R.id.submit_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String user_name= ((EditText)findViewById(R.id.set_name_ET)).getText().toString();
+                final String user_name= ((EditText)findViewById(R.id.set_name_ET)).getText().toString();
                 if(user_name.isEmpty())
                 {
+                    //if user does not have a username, we cannot proceed forward
                     Toast.makeText(AccountSetupActivity.this, "Please enter your name.", Toast.LENGTH_SHORT).show();
+                }
+                else if(!user_name.isEmpty() && profileImageURI==null)
+                {
+                    //this is if user has name but decides not to set any profile image
+
                 }
                 else if(!TextUtils.isEmpty(user_name) && profileImageURI!=null)
                 {
                     setupProgressBar.setVisibility(View.VISIBLE);
-                    String UID=FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    final String UID=FirebaseAuth.getInstance().getCurrentUser().getUid();
                     final StorageReference imagePath = storageReference.child("profile_images").child(UID+".jpg");
                     imagePath.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -90,13 +103,36 @@ public class AccountSetupActivity extends AppCompatActivity {
                             if(task.isSuccessful())
                             {
                                 Task<Uri> downloadUri= imagePath.getDownloadUrl();
-                                Toast.makeText(AccountSetupActivity.this, downloadUri.toString(), Toast.LENGTH_SHORT).show();
+
+                                //the map will contain the details of the user that we will store in our database
+                                Map<String, String> userMap=new HashMap<>();
+                                userMap.put("name", user_name);
+                                userMap.put("profile image",downloadUri.toString());
+
+                                firestore.collection("users").document(UID).set(userMap)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful())
+                                                {
+                                                    startActivity(new Intent(AccountSetupActivity.this,MainActivity.class));
+                                                    finish();
+                                                }
+                                                else
+                                                {
+                                                    String errorMsg=task.getException().getMessage();
+                                                    Toast.makeText(AccountSetupActivity.this, "Firestore Error: "+errorMsg, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                                setupProgressBar.setVisibility(View.INVISIBLE);
+                                            }
+                                        });
                             }
                             else
                             {
                                 Toast.makeText(AccountSetupActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                setupProgressBar.setVisibility(View.INVISIBLE);
                             }
-                            setupProgressBar.setVisibility(View.INVISIBLE);
                         }
                     });
                 }
@@ -106,8 +142,17 @@ public class AccountSetupActivity extends AppCompatActivity {
 
     private void initialiseFields() {
         mAuth=FirebaseAuth.getInstance();
+        firestore=FirebaseFirestore.getInstance();
         storageReference= FirebaseStorage.getInstance().getReference();
         setupProgressBar=findViewById(R.id.account_setup_PB);
+    }
+
+    private void imageCropper() {
+        // start crop image activity to get image for cropping and then use the image in cropping activity
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1,1)
+                .start(AccountSetupActivity.this);
     }
 
     @Override

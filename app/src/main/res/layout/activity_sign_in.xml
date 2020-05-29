@@ -25,7 +25,7 @@
         android:textSize="40sp"
         android:textColor="#FFFFFF"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="70dp"
         android:gravity="center"/>
 
     <TextView
@@ -59,7 +59,7 @@
             android:layout_marginBottom="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginTop="4dp"
-            app:cardCornerRadius="4dp"
+            app:cardCornerRadius="2dp"
             app:cardElevation="2dp">
 
             <com.shobhitpuri.custombuttons.GoogleSignInButton
@@ -70,6 +70,7 @@
                 android:textSize="2sp"
                 app:isDarkTheme="false"
                 android:layout_centerHorizontal="true"
+                android:background="@drawable/roundedbutton"
                 />
 
         </androidx.cardview.widget.CardView>
