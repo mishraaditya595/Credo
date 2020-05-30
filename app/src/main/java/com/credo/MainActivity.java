@@ -14,19 +14,53 @@ import android.widget.Toolbar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onStart() {
         super.onStart();
-        if(FirebaseAuth.getInstance().getCurrentUser()==null) {
+        if(mAuth.getCurrentUser()==null) {
             //if there is no one signed in, it will ask for sign up
             Intent intent = new Intent(MainActivity.this, SignInActivity.class);
             startActivity(intent);
         }
+        else
+        {
+            //if the user is signed in, we check if the user has completed the profile setup
+            firestore.collection("users").document(mAuth.getCurrentUser().getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful())
+                            {
+                                //if task is successful means user exists
+                                if(!task.getResult().exists())
+                                {
+                                    //this means user's profile details are not present in our database
+                                    startActivity(new Intent(MainActivity.this,AccountSetupActivity.class));
+                                    finish();
+                                }
+                            }
+                            else
+                            {
+                                //error handling part
+                                String error=task.getException().getMessage();
+                                Toast.makeText(MainActivity.this, "Firestore error: "+error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+
     }
 
     @Override
@@ -34,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initialiseFields();
         displayToolbar(); //to display the app's toolbar
 
         GoogleSignInAccount signInAccount=GoogleSignIn.getLastSignedInAccount(this);
@@ -48,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,NewPostActivity.class));
             }
         });
+    }
+
+    private void initialiseFields() {
+        mAuth=FirebaseAuth.getInstance();
+        firestore=FirebaseFirestore.getInstance();
     }
 
     private void displayToolbar() {

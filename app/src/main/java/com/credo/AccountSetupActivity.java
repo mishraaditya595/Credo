@@ -210,6 +210,7 @@ public class AccountSetupActivity extends AppCompatActivity {
                 .start(AccountSetupActivity.this);
     }
 
+    //this is to launch the activity to crop the selected image
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
