@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title="Credo Space"
         app:titleTextColor="@color/common_google_signin_btn_text_dark"
         app:titleMargin="2sp"

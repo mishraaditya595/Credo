@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -19,12 +18,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -127,17 +126,9 @@ public class AccountSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final String user_name = ((EditText) findViewById(R.id.set_name_ET)).getText().toString();
-                setupProgressBar.setVisibility(View.VISIBLE);
-                if (isChanged) {
-                    if (user_name.isEmpty()) {
-                        //if user does not have a username, we cannot proceed forward
-                        Toast.makeText(AccountSetupActivity.this, "Please enter your name.", Toast.LENGTH_SHORT).show();
-                    }
-                    //else if(!user_name.isEmpty() && profileImageURI==null)
-
-                    //this is if user has name but decides not to set any profile image
-
-                    else if (!TextUtils.isEmpty(user_name) && profileImageURI != null) {
+                if (!TextUtils.isEmpty(user_name) && profileImageURI != null) {
+                    setupProgressBar.setVisibility(View.VISIBLE);
+                    if (isChanged) {
                         UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                         final StorageReference imagePath = storageReference.child("profile_images").child(UID + ".jpg");
                         imagePath.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -152,11 +143,17 @@ public class AccountSetupActivity extends AppCompatActivity {
                             }
                         });
                     }
+                    else
+                    {
+                        storeFirestore(null,user_name);
+                    }
                 }
-                else
+                else if(user_name.isEmpty())
                 {
-                    storeFirestore(null,user_name);
+                    Toast.makeText(AccountSetupActivity.this, "Username cannot be left empty.", Toast.LENGTH_SHORT).show();
                 }
+                //else if(!TextUtils.isEmpty(user_name) && profileImageURI != null)
+
             }
         });
     }
@@ -167,7 +164,7 @@ public class AccountSetupActivity extends AppCompatActivity {
         Map<String, String> userMap=new HashMap<>();
        if (imagePath!=null)
        {
-           downloadUri = imagePath.getDownloadUrl();
+           downloadUri=imagePath.getDownloadUrl();
            userMap.put("name", user_name);
            userMap.put("profile image",downloadUri.toString());
        }
