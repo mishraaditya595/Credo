@@ -14,6 +14,7 @@ import android.widget.Toolbar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +41,13 @@ public class MainActivity extends AppCompatActivity {
         {
             Toast.makeText(this, signInAccount.getDisplayName(), Toast.LENGTH_SHORT).show();
         }
+
+        ((FloatingActionButton)findViewById(R.id.add_post_button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,NewPostActivity.class));
+            }
+        });
     }
 
     private void displayToolbar() {
