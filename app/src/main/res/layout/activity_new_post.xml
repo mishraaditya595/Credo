@@ -20,9 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="220dp"
         android:layout_below="@+id/new_post_toolbar"
-        android:layout_marginLeft="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="6dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="6dp"
         app:srcCompat="@color/colorAccent"
         tools:ignore="VectorDrawableCompat" />
 
@@ -73,5 +74,16 @@
         android:background="@drawable/edit_text_border"
         android:backgroundTint="@color/colorAccent"/>
 
+    <ProgressBar
+        android:id="@+id/new_post_PB"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/new_post_IV"
+        android:layout_below="@+id/new_post_toolbar"
+        android:layout_alignParentStart="true"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        />
 
 </RelativeLayout>
