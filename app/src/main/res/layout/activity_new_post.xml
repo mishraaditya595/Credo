@@ -21,10 +21,10 @@
         android:layout_height="220dp"
         android:layout_below="@+id/new_post_toolbar"
         android:layout_alignParentEnd="true"
-        android:layout_marginLeft="6dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="6dp"
-        app:srcCompat="@color/colorAccent"
+        android:layout_marginRight="5dp"
+        app:srcCompat="@color/cardview_dark_background"
         tools:ignore="VectorDrawableCompat" />
 
     <EditText
@@ -67,6 +67,8 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"
         android:padding="16dp"
+        android:clickable="true"
+        android:elevation="5dp"
         android:text="Publish"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
