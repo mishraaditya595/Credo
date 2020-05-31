@@ -23,15 +23,32 @@
         android:id="@+id/add_post_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:fabCustomSize="58dp"
+        android:layout_above="@+id/main_bottom_navigation_view"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="23dp"
-        android:layout_marginBottom="53dp"
+        android:layout_marginRight="23dp"
+        android:layout_marginBottom="14dp"
         android:clickable="true"
         android:src="@drawable/ic_add_black_24dp"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:fabCustomSize="58dp"
         tools:ignore="VectorDrawableCompat" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/main_bottom_navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:elevation="5dp"
+        app:menu="@menu/options_nav"/>
+
+    <FrameLayout
+        android:id="@+id/main_container_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/main_bottom_navigation_view"
+        android:layout_below="@+id/main_toolbar"
+        />
 
 
 

@@ -2,6 +2,8 @@ package com.credo;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -83,6 +86,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,NewPostActivity.class));
             }
         });
+
+        ((BottomNavigationView)findViewById(R.id.main_bottom_navigation_view)).setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId())
+                {
+                    case R.id.nav_home:
+                        replaceFragment(new HomeFragment());
+                        return true;
+                    case R.id.nav_notifications:
+                        replaceFragment(new NotificationFragment());
+                        return true;
+                    case R.id.nav_profile:
+                        replaceFragment(new ProfileFragment());
+                        return true;
+                }
+                return false;
+            }
+        });
+
+
     }
 
     private void initialiseFields() {
@@ -121,5 +145,11 @@ public class MainActivity extends AppCompatActivity {
         //to sign out the current user and send him/her back to the sign in activity
         FirebaseAuth.getInstance().signOut();
         startActivity(new Intent(MainActivity.this,SignInActivity.class));
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_container_frame, fragment);
+        fragmentTransaction.commit();
     }
 }
