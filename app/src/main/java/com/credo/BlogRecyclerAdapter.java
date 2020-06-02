@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -22,10 +23,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapter.ViewHolder> {
 
    public List<BlogPost> blogPostList;
    public Context context;
+   private FirebaseFirestore firestore;
 
    public BlogRecyclerAdapter(List<BlogPost> blogPostList){
         this.blogPostList=blogPostList;
@@ -37,12 +41,13 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.blog_layout, parent,false);
        context = parent.getContext();
+       firestore=FirebaseFirestore.getInstance();
 
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         String titleText=blogPostList.get(position).getBlog_title();
         holder.setBlogTitleTV(titleText);
 
@@ -52,8 +57,18 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        String imageURL=blogPostList.get(position).getImage_url();
        holder.setBlogImage(imageURL);
 
-       String username=blogPostList.get(position).getAuthor();
-       holder.setusername(username);
+       String uid=blogPostList.get(position).getAuthor();
+       firestore.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+           @Override
+           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+               if(task.isSuccessful())
+               {
+                   String name=task.getResult().getString("name");
+                   String userImage=task.getResult().getString("profile image");
+                   holder.setAuthorData(name,userImage);
+               }
+           }
+       });
 
        long longTime=blogPostList.get(position).getTimestamp().getTime();
        String timestamp=android.text.format.DateFormat.format("MM/dd/yyyy",new Date(longTime)).toString();
@@ -68,8 +83,9 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     class ViewHolder extends RecyclerView.ViewHolder {
 
        private View view;
-       private TextView descriptionTV, titleTV, usernameTV, timestampTV;
+       private TextView descriptionTV, titleTV, usernameTV, timestampTV, username;
        private ImageView blogImageIV;
+       private CircleImageView profileImageIV;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -88,32 +104,25 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         void setBlogImage(String text){
             blogImageIV=(ImageView)view.findViewById(R.id.blog_image_IV);
+
+            RequestOptions placeholderrequest=new RequestOptions();
+            placeholderrequest.placeholder(R.drawable.com_facebook_button_icon);
             Glide.with(context).load(text).into(blogImageIV);
-        }
-
-        public void setusername(String username) {
-            usernameTV=(TextView)view.findViewById(R.id.username_TV);
-            final String[] authorName = new String[1];
-
-            FirebaseFirestore db=FirebaseFirestore.getInstance();
-            DocumentReference docRef = db.collection("users").document(username);
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            authorName[0] =document.get("name").toString();
-                        }
-                    }
-            }});
-
-            usernameTV.setText(authorName[0]);
         }
 
         public void setTimestamp(String timestamp) {
             timestampTV=(TextView)view.findViewById(R.id.timestamp_TV);
             timestampTV.setText(timestamp);
+        }
+
+        public void setAuthorData(String name, String userImage) {
+            profileImageIV=(CircleImageView)view.findViewById(R.id.author_profile_image_IV);
+            usernameTV=(TextView)view.findViewById(R.id.username_TV);
+
+            usernameTV.setText(name);
+            RequestOptions placeholderrequest=new RequestOptions();
+            placeholderrequest.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait);
+            Glide.with(context).applyDefaultRequestOptions(placeholderrequest).load(userImage).into(profileImageIV);
         }
     }
 }
