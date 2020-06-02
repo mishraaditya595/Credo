@@ -85,25 +85,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ((BottomNavigationView)findViewById(R.id.main_bottom_navigation_view)).setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId())
-                {
-                    case R.id.nav_home:
-                        replaceFragment(new HomeFragment());
-                        return true;
-                    case R.id.nav_notifications:
-                        replaceFragment(new NotificationFragment());
-                        return true;
-                    case R.id.nav_profile:
-                        replaceFragment(new ProfileFragment());
-                        return true;
-                }
-                return false;
-            }
-        });
+        if(mAuth.getCurrentUser()!=null)
+        {
+            replaceFragment(new HomeFragment());//to make the Home Fragment as the default fragment
 
+            ((BottomNavigationView)findViewById(R.id.main_bottom_navigation_view)).setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId())
+                    {
+                        case R.id.nav_home:
+                            replaceFragment(new HomeFragment());
+                            return true;
+                        case R.id.nav_notifications:
+                            replaceFragment(new NotificationFragment());
+                            return true;
+                        case R.id.nav_profile:
+                            replaceFragment(new ProfileFragment());
+                            return true;
+                    }
+                    return false;
+                }
+            });
+        }
 
     }
 

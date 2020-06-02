@@ -1,16 +1,20 @@
 package com.credo;
 
+import java.util.Date;
+
 public class BlogPost {
-    public String author, blogDescription, blogTitle, imageURL, thumbnailURL;
+    public String author, blog_description, blog_title, image_url, thumbnail_url;
+    public Date timestamp;
 
     public BlogPost() { }
 
-    public BlogPost(String author, String blogDescription, String blogTitle, String imageURL, String thumbnailURL, String timestamp) {
+    public BlogPost(String author, String blog_description, String blog_title, String image_url, String thumbnail_url, Date timestamp) {
         this.author = author;
-        this.blogDescription = blogDescription;
-        this.blogTitle = blogTitle;
-        this.imageURL = imageURL;
-        this.thumbnailURL = thumbnailURL;
+        this.blog_description = blog_description;
+        this.blog_title = blog_title;
+        this.image_url = image_url;
+        this.thumbnail_url = thumbnail_url;
+        this.timestamp=timestamp;
     }
 
     public String getAuthor() {
@@ -21,36 +25,43 @@ public class BlogPost {
         this.author = author;
     }
 
-    public String getBlogDescription() {
-        return blogDescription;
+    public String getBlog_description() {
+        return blog_description;
     }
 
-    public void setBlogDescription(String blogDescription) {
-        this.blogDescription = blogDescription;
+    public void setBlog_description(String blog_description) {
+        this.blog_description = blog_description;
     }
 
-    public String getBlogTitle() {
-        return blogTitle;
+    public String getBlog_title() {
+        return blog_title;
     }
 
-    public void setBlogTitle(String blogTitle) {
-        this.blogTitle = blogTitle;
+    public void setBlog_title(String blog_title) {
+        this.blog_title = blog_title;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public String getImage_url() {
+        return image_url;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
-    public String getThumbnailURL() {
-        return thumbnailURL;
+    public String getThumbnail_url() {
+        return thumbnail_url;
     }
 
-    public void setThumbnailURL(String thumbnailURL) {
-        this.thumbnailURL = thumbnailURL;
+    public void setThumbnail_url(String thumbnail_url) {
+        this.thumbnail_url = thumbnail_url;
     }
 
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
 }
