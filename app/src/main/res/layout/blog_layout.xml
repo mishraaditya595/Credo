@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/blog_place_holder_CV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:elevation="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/author_profile_image_IV"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                />
+
+            <TextView
+                android:id="@+id/username_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/author_profile_image_IV"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:text="Username"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/timestamp_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/author_profile_image_IV"
+                android:layout_below="@+id/username_TV"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="2dp"
+                android:text="0/0/00"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/blog_Title_TV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/author_profile_image_IV"
+                android:layout_marginTop="12dp"
+                android:text="Blog Title Here"
+                android:textStyle="bold"
+                android:textSize="26sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textAlignment="center"
+                />
+
+            <ImageView
+                android:id="@+id/blog_image_IV"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/blog_Title_TV"
+                android:layout_marginTop="12dp"
+                android:src="@mipmap/ic_launcher_round"
+                android:scaleType="centerCrop"
+                />
+
+            <TextView
+                android:id="@+id/blog_description_TV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/blog_image_IV"
+                android:layout_marginTop="12dp"
+                android:text="Blog Description Here......."
+                android:inputType="textMultiLine"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="18sp"
+                android:maxLines="3"
+                tools:ignore="TextViewEdits" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

@@ -106,7 +106,7 @@ public class NewPostActivity extends AppCompatActivity {
                                         postMap.put("author",UID);
                                         postMap.put("timestamp",FieldValue.serverTimestamp());
 
-                                        firestore.collection("posts").document(UID).collection(blogTitle).document().set(postMap)
+                                        firestore.collection("posts").document(blogTitle+"_"+UID).set(postMap)
                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
