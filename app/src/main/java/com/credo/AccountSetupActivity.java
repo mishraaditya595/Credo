@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -36,6 +35,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -128,7 +128,8 @@ public class AccountSetupActivity extends AppCompatActivity {
                 final String user_name = ((EditText) findViewById(R.id.set_name_ET)).getText().toString();
                 if (!TextUtils.isEmpty(user_name) && profileImageURI != null) {
                     setupProgressBar.setVisibility(View.VISIBLE);
-                    if (isChanged) {
+                    if (isChanged)
+                    {
                         UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                         final StorageReference imagePath = storageReference.child("profile_images").child(UID + ".jpg");
                         imagePath.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -153,7 +154,6 @@ public class AccountSetupActivity extends AppCompatActivity {
                     Toast.makeText(AccountSetupActivity.this, "Username cannot be left empty.", Toast.LENGTH_SHORT).show();
                 }
                 //else if(!TextUtils.isEmpty(user_name) && profileImageURI != null)
-
             }
         });
     }
@@ -162,17 +162,17 @@ public class AccountSetupActivity extends AppCompatActivity {
         Task<Uri> downloadUri;
         //the map will contain the details of the user that we will store in our database
         Map<String, String> userMap=new HashMap<>();
-       if (imagePath!=null)
-       {
-           downloadUri=imagePath.getDownloadUrl();
-           userMap.put("name", user_name);
-           userMap.put("profile image",downloadUri.toString());
-       }
-       else
-       {
-           userMap.put("name", user_name);
-           userMap.put("profile image",profileImageURI.toString());
-       }
+        if (imagePath!=null)
+        {
+            downloadUri=imagePath.getDownloadUrl();
+            userMap.put("name", user_name);
+            userMap.put("profile image",downloadUri.toString());
+        }
+        else
+        {
+            userMap.put("name", user_name);
+            userMap.put("profile image",profileImageURI.toString());
+        }
 
         firestore.collection("users").document(UID).set(userMap)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -187,7 +187,6 @@ public class AccountSetupActivity extends AppCompatActivity {
                         {
                             String errorMsg=task.getException().getMessage();
                             Toast.makeText(AccountSetupActivity.this, "Firestore Error: "+errorMsg, Toast.LENGTH_SHORT).show();
-
                         }
                         setupProgressBar.setVisibility(View.INVISIBLE);
                     }

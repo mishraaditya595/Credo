@@ -32,6 +32,7 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore firestore;
     private BlogRecyclerAdapter blogRecyclerAdapter;
     private DocumentSnapshot lastVisible;
+    private boolean isFirstLoaded=true;
 
     public HomeFragment() {
     }
@@ -64,21 +65,42 @@ public class HomeFragment extends Fragment {
             Query firstQuery=firestore.collection("posts").orderBy("timestamp", Query.Direction.DESCENDING).limit(4);
 
             firstQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                //getActivity() will attach the query to the activity so when we switch queries and come
+                //back to this activity again, it will start from the beginning again
                 @Override
                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
-                    lastVisible=queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size()-1);
+                    if(isFirstLoaded)
+                    {
+                        //the last visible will be updated only if data is retrieved for the first time
+                        lastVisible=queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size()-1);
+                    }
+
 
                     assert queryDocumentSnapshots != null;
                     for(DocumentChange doc: queryDocumentSnapshots.getDocumentChanges())
                     {
                         if(doc.getType() == DocumentChange.Type.ADDED)
                         {
-                            BlogPost blogPost=doc.getDocument().toObject(BlogPost.class);
-                            blogPostList.add(blogPost);
+                            String blogPostID=doc.getDocument().getId();
+
+                            BlogPost blogPost=doc.getDocument().toObject(BlogPost.class).withId(blogPostID);
+                            if(isFirstLoaded)
+                            {
+                                //if data is retrieved for the first time, show it
+                                blogPostList.add(blogPost);
+                            }
+                            else
+                            {
+                                //if existing data is already retrieved and we are retrieving the new data
+                                blogPostList.add(0,blogPost); //the 0 here indicates the position where new daa will be shown
+                                //0 means the top or first
+                            }
                             blogRecyclerAdapter.notifyDataSetChanged();
                         }
                     }
+
+                    isFirstLoaded=false; //this is to indicate that data is retrieved once
                 }
             });
 
@@ -103,7 +125,9 @@ public class HomeFragment extends Fragment {
                 .startAfter(lastVisible)
                 .limit(4);
 
-        nextQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        nextQuery.addSnapshotListener( new EventListener<QuerySnapshot>() {
+            //getActivity() will attach the query to the activity so when we switch queries and come
+            //back to this activity again, it will start from the beginning again
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
@@ -118,7 +142,9 @@ public class HomeFragment extends Fragment {
                     {
                         if(doc.getType() == DocumentChange.Type.ADDED)
                         {
-                            BlogPost blogPost=doc.getDocument().toObject(BlogPost.class);
+                            String blogPostID=doc.getDocument().getId();
+
+                            BlogPost blogPost=doc.getDocument().toObject(BlogPost.class).withId(blogPostID);
                             blogPostList.add(blogPost);
                             blogRecyclerAdapter.notifyDataSetChanged();
                         }

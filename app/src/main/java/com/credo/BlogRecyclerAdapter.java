@@ -14,14 +14,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -30,6 +34,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
    public List<BlogPost> blogPostList;
    public Context context;
    private FirebaseFirestore firestore;
+   private FirebaseAuth mAuth;
 
    public BlogRecyclerAdapter(List<BlogPost> blogPostList){
         this.blogPostList=blogPostList;
@@ -42,12 +47,17 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.blog_layout, parent,false);
        context = parent.getContext();
        firestore=FirebaseFirestore.getInstance();
+       mAuth=FirebaseAuth.getInstance();
 
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+
+       final String blogPostID=blogPostList.get(position).blogPostID;
+       final String currentUserID=mAuth.getCurrentUser().getUid();
+
         String titleText=blogPostList.get(position).getBlog_title();
         holder.setBlogTitleTV(titleText);
 
@@ -55,7 +65,8 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        holder.setDescriptionTV(descriptionText);
 
        String imageURL=blogPostList.get(position).getImage_url();
-       holder.setBlogImage(imageURL);
+       String thumbnailURl=blogPostList.get(position).getThumbnail_url();
+       holder.setBlogImage(imageURL,thumbnailURl);
 
        String uid=blogPostList.get(position).getAuthor();
        firestore.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -73,6 +84,18 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        long longTime=blogPostList.get(position).getTimestamp().getTime();
        String timestamp=android.text.format.DateFormat.format("MM/dd/yyyy",new Date(longTime)).toString();
        holder.setTimestamp(timestamp);
+
+       //like feature implementation here
+        holder.blogLikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> likesMap=new HashMap<>();
+                likesMap.put("timestamp", FieldValue.serverTimestamp());
+
+                firestore.collection("posts").document(blogPostID).collection("likes")
+                        .document(currentUserID).set(likesMap);
+            }
+        });
     }
 
     @Override
@@ -86,10 +109,14 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        private TextView descriptionTV, titleTV, usernameTV, timestampTV, username;
        private ImageView blogImageIV;
        private CircleImageView profileImageIV;
+       private ImageView blogLikeButton;
+       private TextView blogLikeCount;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             view=itemView;
+
+            blogLikeButton=view.findViewById(R.id.like_button_IV);
         }
 
         void setBlogTitleTV(String text){
@@ -102,12 +129,12 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             descriptionTV.setText(text);
         }
 
-        void setBlogImage(String text){
+        void setBlogImage(String imageURL, String thumbnailURL){
             blogImageIV=(ImageView)view.findViewById(R.id.blog_image_IV);
 
             RequestOptions placeholderrequest=new RequestOptions();
             placeholderrequest.placeholder(R.drawable.com_facebook_button_icon);
-            Glide.with(context).load(text).into(blogImageIV);
+            Glide.with(context).applyDefaultRequestOptions(placeholderrequest).load(imageURL).thumbnail(Glide.with(context).load(thumbnailURL)).into(blogImageIV);
         }
 
         public void setTimestamp(String timestamp) {

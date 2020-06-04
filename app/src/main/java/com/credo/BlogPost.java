@@ -2,7 +2,7 @@ package com.credo;
 
 import java.util.Date;
 
-public class BlogPost {
+public class BlogPost extends BlogPostID {
     public String author, blog_description, blog_title, image_url, thumbnail_url;
     public Date timestamp;
 

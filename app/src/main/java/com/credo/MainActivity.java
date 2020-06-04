@@ -27,9 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
 
+
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initialiseFields();
+
         if(mAuth.getCurrentUser()==null) {
             //if there is no one signed in, it will ask for sign up
             Intent intent = new Intent(MainActivity.this, SignInActivity.class);
@@ -62,14 +67,6 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        initialiseFields();
         displayToolbar(); //to display the app's toolbar
 
         GoogleSignInAccount signInAccount=GoogleSignIn.getLastSignedInAccount(this);
