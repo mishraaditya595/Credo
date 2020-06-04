@@ -90,8 +90,8 @@
 
             <ImageView
                 android:id="@+id/like_button_IV"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:layout_below="@+id/blog_description_TV"
                 android:layout_marginTop="12dp"
                 android:layout_marginLeft="10dp"
@@ -104,34 +104,12 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/blog_description_TV"
                 android:layout_toRightOf="@+id/like_button_IV"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="21dp"
                 android:layout_marginLeft="10dp"
                 android:text="0 Likes"
                 android:textSize="16sp"
                 />
 
-            <ImageView
-                android:id="@+id/dislike_button_IV"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_below="@+id/blog_description_TV"
-                android:layout_toRightOf="@+id/like_count_TV"
-                android:layout_marginTop="12dp"
-                android:layout_marginLeft="10dp"
-                android:src="@mipmap/ic_dislike_button"
-                />
-
-            <TextView
-                android:id="@+id/dislike_count_TV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/blog_description_TV"
-                android:layout_toRightOf="@+id/dislike_button_IV"
-                android:layout_marginTop="18dp"
-                android:layout_marginLeft="10dp"
-                android:text="0 Dislikes"
-                android:textSize="16sp"
-                />
 
         </RelativeLayout>
 

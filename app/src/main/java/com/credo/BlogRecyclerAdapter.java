@@ -1,6 +1,7 @@
 package com.credo;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,8 +20,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.DateFormat;
@@ -26,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,6 +61,8 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+
+       holder.setIsRecyclable(false); //to fix the delay
 
        final String blogPostID=blogPostList.get(position).blogPostID;
        final String currentUserID=mAuth.getCurrentUser().getUid();
@@ -85,15 +94,70 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        String timestamp=android.text.format.DateFormat.format("MM/dd/yyyy",new Date(longTime)).toString();
        holder.setTimestamp(timestamp);
 
+       //get likes count
+        firestore.collection("posts").document(blogPostID).collection("likes")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if(!queryDocumentSnapshots.isEmpty())
+                        {
+                            //this means there are likes for the post
+                            holder.updateLikesCount(queryDocumentSnapshots.size());
+                        }
+                        else
+                        {
+                            //this means there are no likes for the post
+                            holder.updateLikesCount(0);
+                        }
+                    }
+                });
+
+       //set the colour of like button for liked and not liked posts
+        firestore.collection("posts").document(blogPostID).collection("likes").document(currentUserID)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if(documentSnapshot.exists())
+                        {
+                            //if already liked, change the like button to the accented one
+                            holder.blogLikeButton.setImageDrawable(context.getDrawable(R.mipmap.ic_like_button_accented));
+                        }
+                        else
+                        {
+                            //if has not liked, keep the like button as it is
+                            holder.blogLikeButton.setImageDrawable(context.getDrawable(R.mipmap.ic_like_button));
+                        }
+                    }
+                });
+
+
        //like feature implementation here
         holder.blogLikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> likesMap=new HashMap<>();
-                likesMap.put("timestamp", FieldValue.serverTimestamp());
+                firestore.collection("posts").document(blogPostID).collection("likes").document(currentUserID)
+                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(!Objects.requireNonNull(task.getResult()).exists())
+                        {
+                            //if user has not liked the blog post, we will add a like
+                            Map<String, Object> likesMap=new HashMap<>();
+                            likesMap.put("timestamp", FieldValue.serverTimestamp());
 
-                firestore.collection("posts").document(blogPostID).collection("likes")
-                        .document(currentUserID).set(likesMap);
+                            firestore.collection("posts").document(blogPostID).collection("likes")
+                                    .document(currentUserID).set(likesMap);
+                        }
+                        else
+                        {
+                            //this is if the user has already liked the blog post, tapping on the button again will unlike it
+                            firestore.collection("posts").document(blogPostID).collection("likes")
+                                    .document(currentUserID).delete();
+                        }
+                    }
+                });
+
             }
         });
     }
@@ -150,6 +214,12 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             RequestOptions placeholderrequest=new RequestOptions();
             placeholderrequest.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait);
             Glide.with(context).applyDefaultRequestOptions(placeholderrequest).load(userImage).into(profileImageIV);
+        }
+
+        public void updateLikesCount(int count)
+        {
+            blogLikeCount=view.findViewById(R.id.like_count_TV);
+            blogLikeCount.setText(count+" Likes");
         }
     }
 }
