@@ -1,10 +1,12 @@
 package com.credo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,7 +69,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        final String blogPostID=blogPostList.get(position).blogPostID;
        final String currentUserID=mAuth.getCurrentUser().getUid();
 
-        String titleText=blogPostList.get(position).getBlog_title();
+        final String titleText=blogPostList.get(position).getBlog_title();
         holder.setBlogTitleTV(titleText);
 
        String descriptionText=blogPostList.get(position).getBlog_description();
@@ -160,6 +162,17 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
             }
         });
+
+        //comment feature implementation here
+        holder.blogCommentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.startActivity(new Intent(context, CommentsActivity.class)
+                        .putExtra("blog_post_id",blogPostID).putExtra("blog_title",titleText));
+            }
+        });
+
+
     }
 
     @Override
@@ -173,7 +186,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
        private TextView descriptionTV, titleTV, usernameTV, timestampTV, username;
        private ImageView blogImageIV;
        private CircleImageView profileImageIV;
-       private ImageView blogLikeButton;
+       private ImageView blogLikeButton, blogCommentsButton;
        private TextView blogLikeCount;
 
         ViewHolder(@NonNull View itemView) {
@@ -181,6 +194,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             view=itemView;
 
             blogLikeButton=view.findViewById(R.id.like_button_IV);
+            blogCommentsButton=view.findViewById(R.id.comments_button);
         }
 
         void setBlogTitleTV(String text){
