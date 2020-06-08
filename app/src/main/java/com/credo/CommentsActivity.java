@@ -35,7 +35,7 @@ public class CommentsActivity extends AppCompatActivity {
         displayToolbar();
 
         //to receive the blog post id from the recycler adapter activity
-        blogPostDoc=getIntent().getStringExtra("blog_title") + "_" + getIntent().getStringExtra("blog_post_id");
+        blogPostDoc=getIntent().getStringExtra("blog_post_id");
 
         ((CircleImageView)findViewById(R.id.send_button)).setOnClickListener(new View.OnClickListener() {
             @Override

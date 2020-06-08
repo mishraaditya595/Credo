@@ -168,7 +168,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             @Override
             public void onClick(View v) {
                 context.startActivity(new Intent(context, CommentsActivity.class)
-                        .putExtra("blog_post_id",blogPostID).putExtra("blog_title",titleText));
+                        .putExtra("blog_post_id",blogPostID));
             }
         });
 
