@@ -4,14 +4,14 @@ import java.util.Date;
 
 public class Comments {
 
-    private String message, UID;
+    private String message, userID;
     private Date timestamp;
 
     public Comments() {}
 
     public Comments(String message, String UID, Date timestamp) {
         this.message = message;
-        this.UID = UID;
+        this.userID = UID;
         this.timestamp = timestamp;
     }
 
@@ -23,12 +23,12 @@ public class Comments {
         this.message = message;
     }
 
-    public String getUID() {
-        return UID;
+    public String getUserID() {
+        return userID;
     }
 
-    public void setUID(String UID) {
-        this.UID = UID;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public Date getTimestamp() {

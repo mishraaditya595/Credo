@@ -9,15 +9,26 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecyclerAdapter.ViewHolder> {
 
     public List<Comments> commentsList;
     public Context context;
+    private FirebaseFirestore firestore;
 
     public CommentsRecyclerAdapter(List<Comments> commentsList) {
         this.commentsList = commentsList;
+        firestore=FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -29,13 +40,25 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CommentsRecyclerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final CommentsRecyclerAdapter.ViewHolder holder, int position) {
+
         holder.setIsRecyclable(false);
-
-
 
         String commentMessage=commentsList.get(position).getMessage();
         holder.setCommentMessage(commentMessage);
+
+        String uid = commentsList.get(position).getUserID();
+        firestore.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful())
+                {
+                    String name=task.getResult().getString("name");
+                    String userImage=task.getResult().getString("profile image");
+                    holder.setCommentatorData(name,userImage);
+                }
+            }
+        });
     }
 
     @Override
@@ -49,7 +72,9 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private View view;
-        private TextView commentMessageTV;
+        private TextView commentMessageTV, usernameTV;
+        private CircleImageView profileImageIV;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -59,6 +84,16 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
         public void setCommentMessage(String commentMessage) {
             commentMessageTV=view.findViewById(R.id.comment_message_TV);
             commentMessageTV.setText(commentMessage);
+        }
+
+        public void setCommentatorData(String name, String userImage) {
+            profileImageIV=(CircleImageView)view.findViewById(R.id.profile_image_comments_IV);
+            usernameTV=(TextView)view.findViewById(R.id.username_comments_TV);
+
+            usernameTV.setText(name);
+            RequestOptions placeholderrequest=new RequestOptions();
+            placeholderrequest.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait);
+            Glide.with(context).applyDefaultRequestOptions(placeholderrequest).load(userImage).into(profileImageIV);
         }
     }
 }
