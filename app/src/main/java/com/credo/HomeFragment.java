@@ -74,6 +74,7 @@ public class HomeFragment extends Fragment {
                     {
                         //the last visible will be updated only if data is retrieved for the first time
                         lastVisible=queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size()-1);
+                        blogPostList.clear();
                     }
 
 
